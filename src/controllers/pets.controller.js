@@ -7,6 +7,28 @@ const getAllPets = async(req,res)=>{
     res.send({status:"success",payload:pets})
 }
 
+const getAllAdoptions = async (req, res) => {
+    try {
+        const adoptions = await adoptionsService.getAll();
+        res.status(200).json(adoptions);  // Devuelve solo el array
+    } catch (error) {
+        res.status(500).send({ status: "error", error: "Internal Server Error" });
+    }
+};
+
+const createAdoption = async (req, res) => {
+    try {
+        const { userId, petId, date } = req.body;
+        if (!userId || !petId || !date) {
+            return res.status(400).send({ status: "error", error: "Incomplete values" });
+        }
+        const newAdoption = await adoptionsService.create({ userId, petId, date });
+        res.status(201).send({ status: "success", payload: newAdoption });
+    } catch (error) {
+        res.status(500).send({ status: "error", error: "Internal Server Error" });
+    }
+};
+
 const createPet = async(req,res)=> {
     const {name,specie,birthDate} = req.body;
     if(!name||!specie||!birthDate) return res.status(400).send({status:"error",error:"Incomplete values"})
@@ -48,5 +70,7 @@ export default {
     createPet,
     updatePet,
     deletePet,
-    createPetWithImage
+    createPetWithImage,
+    getAllAdoptions,
+    createAdoption
 }
