@@ -1,3 +1,4 @@
+import PetModel from '../dao/models/Pet.js'; 
 import MockingService from "../services/mocking.js";
 import { usersService, petsService } from "../services/index.js";
 
@@ -12,8 +13,9 @@ const validateServices = () => {
 
 const getMockingPets = async (req, res) => {
     try {
-        const pets = await MockingService.generateMockingPets(100);
-        res.status(200).send({ status: "success", payload: pets });
+        const pets = await MockingService.generateMockingPets(15);
+        const savedPets = await PetModel.insertMany(pets);
+        res.status(201).send({ status: "success", payload: savedPets });
     } catch (error) {
         console.error("Error generating mock pets:", error);
         res.status(500).send({ status: "error", error: "Error generating mock pets" });
@@ -67,6 +69,7 @@ const generateData = async (req, res) => {
             savedUsersCount: savedUsers.length,
             savedPetsCount: savedPets.length
         });
+        
     } catch (error) {
         console.error("Error generating or saving data:", error);
         res.status(500).send({ status: "error", error: "Error generating or saving data" });

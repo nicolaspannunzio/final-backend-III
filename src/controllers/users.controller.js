@@ -1,4 +1,5 @@
 import { usersService } from "../services/index.js";
+import User from '../dao/models/User.js';
 
 const getAllUsers = async (req, res) => {
     try {
@@ -9,16 +10,22 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-const createUser = async (req, res) => {
+export const createUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body; // Asegúrate de que los campos estén siendo enviados
-        if (!name || !email || !password) {
-            return res.status(400).send({ status: "error", error: "Incomplete values" });
-        }
-        const newUser = await usersService.create({ name, email, password });
-        res.status(201).send({ status: "success", payload: newUser });
+        const { first_name, last_name, email, password } = req.body;
+        const newUser = new User({ first_name, last_name, email, password });
+        await newUser.save();
+        res.status(201).json({
+            status: 'success',
+            payload: newUser,
+        });
     } catch (error) {
-        res.status(500).send({ status: "error", error: "Internal Server Error" });
+        console.error('Error creating user', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Error creating user',
+            error: error.message,
+        });
     }
 };
 
@@ -65,9 +72,9 @@ const deleteUser = async (req, res) => {
 };
 
 export default {
-    deleteUser,
-    getAllUsers,
-    getUser,
-    updateUser,
-    createUser
+                deleteUser,
+                getAllUsers,
+                getUser,
+                updateUser,
+                createUser
 };

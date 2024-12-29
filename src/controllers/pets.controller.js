@@ -2,15 +2,15 @@ import PetDTO from "../dto/Pet.dto.js";
 import { petsService } from "../services/index.js"
 import { __dirname } from "../utils/index.js";
 
-const getAllPets = async(req,res)=>{
+const getAllPets = async (req,res) => {
     const pets = await petsService.getAll();
-    res.send({status:"success",payload:pets})
+    res.send ({ status:"success",payload:pets })
 }
 
 const getAllAdoptions = async (req, res) => {
     try {
         const adoptions = await adoptionsService.getAll();
-        res.status(200).json(adoptions);  // Devuelve solo el array
+        res.status(200).json(adoptions);
     } catch (error) {
         res.status(500).send({ status: "error", error: "Internal Server Error" });
     }
@@ -65,12 +65,13 @@ const createPetWithImage = async(req,res) =>{
     const result = await petsService.create(pet);
     res.send({status:"success",payload:result})
 }
+
 export default {
-    getAllPets,
-    createPet,
-    updatePet,
-    deletePet,
-    createPetWithImage,
-    getAllAdoptions,
-    createAdoption
+                getAllPets,
+                createPet,
+                updatePet,
+                deletePet,
+                createPetWithImage,
+                getAllAdoptions,
+                createAdoption 
 }

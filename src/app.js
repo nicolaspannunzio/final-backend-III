@@ -15,8 +15,8 @@ const PORT = process.env.PORT || 8080;
 
 mongoose.set("strictQuery", true);
 mongoose.connect(process.env.DB_URI)
-  .then(() => console.log('Conexión exitosa a MongoDB'))
-  .catch((err) => console.error('Error conectando a MongoDB:', err));
+    .then(() => console.log("DB connected"))
+    .catch((err) => console.error("Error connecting to the database:", err));
 
 app.use(express.json());
 app.use(cookieParser());

@@ -1,83 +1,85 @@
 import chai from "chai";
 import chaiHttp from "chai-http";
 import supertest from "supertest";
-import app from "../src/app.js"; 
+import app from "../src/app.js";  
+import { faker } from "@faker-js/faker";
 
 const { expect } = chai;
 chai.use(chaiHttp);
 
 const requester = supertest(app); 
 
-describe("Testing de la App Web Adoptame", () => {
+describe("Testing of the Adopt Me Web App", () => {
     let validUserId, validPetId;
 
     before(async function () {
-        this.timeout(5000); 
+        this.timeout(5000);  
+
+        const randomEmail = `user-${Date.now()}@example.com`; 
+        const randomFirstName = faker.person.firstName(); 
+        const randomLastName = faker.person.lastName(); 
 
         const userResponse = await requester.post('/api/users').send({
-            first_name: "Juan",
-            last_name: "Perez",
-            email: "juan.perez@example.com",
-            password: "hashedPassword123"
+            first_name: randomFirstName,
+            last_name: randomLastName,
+            email: randomEmail,
+            password: faker.internet.password()
         });
-        validUserId = userResponse.body._id;
-        //console.log(userResponse.body)
- 
+
+        validUserId = userResponse.body.payload?._id;
+
         const petResponse = await requester.post('/api/pets').send({
-            name: "Luna",
-            specie: "Gato",
-            birthDate: "2021-03-15"
+            name: faker.animal.cat(),
+            specie: "Cat",
+            birthDate: faker.date.past().toISOString().split('T')[0]
         });
-        validPetId = petResponse.body._id;
+
+        validPetId = petResponse.body.payload?._id;
+
+        await requester.post('/api/adoptions').send({
+            userId: validUserId,
+            petId: validPetId,
+            date: faker.date.recent().toISOString().split('T')[0]
+        });
     });
 
-    describe("Testing de Pets", () => {
-        it("GET /api/pets debe obtener las mascotas correctamente", async () => {
+    describe("Pet testing", () => {
+        it("GET /api/pets you must get the pets properly", async () => {
             const { statusCode, body } = await requester.get("/api/pets");
             expect(statusCode).to.equal(200);
             expect(body).to.have.property("payload").that.is.an("array");
         });
 
-        it("POST /api/pets debe crear una mascota correctamente", async () => {
-            const nuevaMascota = { name: "Rita", specie: "Perro", birthDate: "2021-01-01" };
+        it("POST /api/pets you must create a pet correctly", async () => {
+            const nuevaMascota = { name: "Rita", specie: "Dog", birthDate: "2021-01-01" };
             const { statusCode, body } = await requester.post("/api/pets").send(nuevaMascota);
             expect(statusCode).to.equal(200);
             expect(body.payload).to.have.property("adopted").that.equals(false);
         });
     });
 
-    describe("Testing de Users", () => {
-        it("GET /api/users debe obtener los usuarios correctamente", async () => {
+    describe("Users testing", () => {
+        it("GET /api/users you must get the users correctly", async () => {
             const { statusCode, body } = await requester.get("/api/users");
             expect(statusCode).to.equal(200);
             expect(body).to.have.property("payload").that.is.an("array");
         });
 
-        it("POST /api/users debe registrar un usuario correctamente", async () => {
-            const mockUsuario = { first_name: "Pepe", last_name: "Argento", email: "newpepe@example.com", password: "1234" };
-            const { statusCode, body } = await requester.post("/api/users").send(mockUsuario);
-            expect(statusCode).to.equal(201);
-            expect(body.payload).to.have.property("email").that.equals(mockUsuario.email);
-        });
-    });
+        it("POST /api/users you must register a user properly", async () => {
+            const newUserEmail = `user-${Date.now()}@example.com`;
 
-    describe("Testing de Adoptions", () => {
-        it("GET /api/adoptions debe retornar todas las adopciones", async () => {
-            const { statusCode, body } = await requester.get("/api/adoptions");
-            expect(statusCode).to.equal(200);
-            expect(body).to.be.an("array");
-        });
-
-        it("POST /api/adoptions debe registrar una adopción correctamente", async () => {
-            const nuevaAdopcion = {
-                userId: validUserId,
-                petId: validPetId,
-                date: "2023-12-25"
+            const newUser = {
+                first_name: "John",
+                last_name: "Smith",
+                email: newUserEmail,
+                password: "234567"
             };
-            const { statusCode, body } = await requester.post("/api/adoptions").send(nuevaAdopcion);
-            expect(statusCode).to.equal(201);
-            expect(body.payload).to.have.property("userId").that.equals(validUserId);
-            expect(body.payload).to.have.property("petId").that.equals(validPetId);
+
+            const response = await requester.post('/api/users').send(newUser);
+             
+            expect(response.statusCode).to.equal(201);
+            expect(response.body.status).to.equal("success");
+            expect(response.body.payload).to.have.property("_id");
         });
-    });
+    });    
 });

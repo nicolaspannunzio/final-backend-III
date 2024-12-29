@@ -20,7 +20,8 @@ const register = async (req, res) => {
         console.log(result);
         res.send({ status: "success", payload: result._id });
     } catch (error) {
-
+        console.error("Error in register function:", error);
+        res.status(500).send({ status: "error", error: "Internal server error" });
     }
 }
 
@@ -53,17 +54,19 @@ const unprotectedLogin  = async(req,res) =>{
     const token = jwt.sign(user,'tokenSecretJWT',{expiresIn:"1h"});
     res.cookie('unprotectedCookie',token,{maxAge:3600000}).send({status:"success",message:"Unprotected Logged in"})
 }
+
 const unprotectedCurrent = async(req,res)=>{
     const cookie = req.cookies['unprotectedCookie']
     const user = jwt.verify(cookie,'tokenSecretJWT');
     if(user)
         return res.send({status:"success",payload:user})
 }
+
 export default {
-    current,
-    login,
-    register,
-    current,
-    unprotectedLogin,
-    unprotectedCurrent
+                current,
+                login,
+                register,
+                current,
+                unprotectedLogin,
+                unprotectedCurrent
 }

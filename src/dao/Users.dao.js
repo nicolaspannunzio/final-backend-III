@@ -1,6 +1,5 @@
 import userModel from "./models/User.js";
 
-
 export default class Users {
     
     get = (params) =>{
@@ -12,7 +11,12 @@ export default class Users {
     }
 
     save = (doc) =>{
-        return userModel.create(doc);
+        try {
+            return userModel.create(doc);
+        } catch (error) {
+            console.error('Error al guardar el usuario:', error); 
+            throw error;
+        }
     }
 
     update = (id,doc) =>{
