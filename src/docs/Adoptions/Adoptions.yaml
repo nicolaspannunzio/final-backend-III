@@ -1,0 +1,115 @@
+paths:
+  /api/adoptions:
+    get:
+      summary: Get all adoptions
+      tags:
+        - Adoptions
+      responses:
+        "200":
+          description: Successfully retrieved all adoptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Adoption"
+        "500":
+          description: Internal server error
+
+  /api/adoptions/{aid}:
+    get:
+      summary: Get a specific adoption by ID
+      tags:
+        - Adoptions
+      parameters:
+        - name: aid
+          in: path
+          required: true
+          description: ID of the adoption to retrieve
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Adoption found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Adoption"
+        "500":
+          description: Internal server error
+
+  /api/adoptions/{uid}/{pid}:
+    post:
+      summary: Create a new adoption
+      tags:
+        - Adoptions
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID of the user adopting the pet
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: ID of the pet being adopted
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/createAdoption"
+      responses:
+        "201":
+          description: Adoption created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Adoption"
+        "400":
+          description: Invalid userId or petId
+        "404":
+          description: User or pet not found
+        "500":
+          description: Internal server error
+
+components:
+  schemas:
+    Adoption:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the adoption
+        user:
+          type: string
+          description: ID of the user who adopted the pet
+        pet:
+          type: string
+          description: ID of the pet being adopted
+        details:
+          type: string
+          description: Additional details about the adoption
+        date:
+          type: string
+          format: date-time
+          description: Date of the adoption
+      example:
+        id: "507f1f77bcf86cd799439011"
+        user: "507f191e810c19729de860ea"
+        pet: "507f191e810c19729de860eb"
+        details: "Adopted from shelter XYZ"
+        date: "2025-01-10T10:00:00Z"
+
+  requestBodies:
+    createAdoption:
+      type: object
+      properties:
+        adoptionDetails:
+          type: string
+          description: Additional details about the adoption
+      example:
+        adoptionDetails: "Adopted from shelter XYZ"

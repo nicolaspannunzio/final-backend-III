@@ -1,0 +1,142 @@
+paths: 
+  /api/users:
+    get:
+      summary: Get all users from the database
+      tags:
+        - Users
+      responses: 
+        "200":
+          description: Successfully retrieved all users
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: "#components/schemas/User"
+        "500":
+          description: Internal server error
+    post: 
+      summary: This endpoint creates a new user
+      tags: 
+        - Users
+      requestBody: 
+        required: true
+        content: 
+          application/json:
+            schema: 
+              $ref: "#components/requestBodies/createUser"
+      responses: 
+        "201":
+          description: User created successfully
+        "500":
+          description: Internal server error
+  /api/users/{uid}:
+    get:
+      summary: Get a single user by ID
+      tags: 
+        - Users
+      parameters: 
+      - name: uid
+        in: path
+        required: true
+        description: ID of the user to retrieve
+        schema: 
+          type: string
+      responses: 
+        "200":
+          description: User found
+          content: 
+            application/json: 
+              schema: 
+                type: array
+                items: 
+                  $ref: "#components/schemas/User"
+        "500":
+          description: Internal server error
+    put:
+      summary: Update user by ID
+      tags: 
+        - Users
+      parameters: 
+      - name: uid
+        in: path
+        required: true
+        description: ID of the user to update
+        schema:
+          type: string
+      requestBody: 
+        required: true
+        content: 
+          application/json: 
+            schema: 
+              $ref: "#components/requestBodies/updateUser"
+      responses: 
+        "200":
+          description: User updated successfully
+        "404":
+          description: User not found
+        "500":
+          description: Internal critical server error
+components: 
+  schemas: 
+    User:
+      type: object
+      properties: 
+        _id:
+          type: ObjectId
+          description: Auto-generated ID by MongoDB
+        first_name: 
+          type: string
+          description: User's first name
+        last_name: 
+          type: string
+          description: User's last name
+        password: 
+          type: string
+          description: User's password
+      example: 
+        _id: ObjectId("123456")
+        first_name: Marga
+        last_name: Rita
+        password: 6589
+  requestBodies: 
+    createUser: 
+      type: object
+      properties: 
+        first_name: 
+          type: string
+          description: User's first name
+        last_name: 
+          type: string
+          description: User's last name
+        password: 
+          type: string
+          description: User's password
+        email: 
+          type: string
+          description: User's email
+      example: 
+        first_name: Pipa
+        last_name: Chimote
+        password: 7842
+        email: pipa@chimote.com
+    updateUser:
+      type: object
+      properties: 
+        first_name: 
+          type: string
+          description: User's first name
+        last_name: 
+          type: string
+          description: User's last name
+        password: 
+          type: string
+          description: User's password
+        email: 
+          type: string
+          description: User's email
+      example: 
+        first_name: Pipa
+        last_name: Chimote
+        password: 7842
+        email: pipa@chimote.com
